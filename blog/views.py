@@ -1,0 +1,105 @@
+from typing import Any
+from django.views.generic import ListView, DetailView
+from account.models import User
+from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404
+# from django.http import HttpResponse, JsonResponse, Http404
+from .models import Article, Category
+from account.mixins import AuthorAccessMixin
+
+
+# Create your views here.
+
+# Below code does the same as ArticleList()
+
+# def home(request, page=1):
+#     articles_list = Article.objects.published()
+#     paginator = Paginator(articles_list, 1)
+#     articles = paginator.get_page(page)
+#     context = {
+#         # this code is used to fetch data according to status which published and orderd bu publish descending (-) the 3 last item
+#         # "articles": Article.objects.filter(status="p").order_by("-publish")[:3]
+#         "articles": articles
+#     }
+#     return render(request, "blog/home.html", context)
+
+class ArticleListView(ListView):
+    # model = Article
+    # template_name = "blog/home.html"
+    # context_object_name = "articles"
+    queryset = Article.objects.published()
+    paginate_by = 1
+
+
+class ArticleDetailView(DetailView):
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        return get_object_or_404(Article.objects.published(), slug=slug)
+
+# OR
+
+# def detail(request, slug):
+#     # if using 404 from http
+#     # try:
+#     #     article = Article.objects.get(slug=slug)
+#     # except Exception as e:
+#     #     raise Http404
+#     context = {
+#         # "article": article
+#         # if using render
+#         "article": get_object_or_404(Article.objects.published(), slug=slug)
+
+    # }
+    # return render(request, "blog/detail.html", context)
+
+class ArticlePreview(AuthorAccessMixin, DetailView):
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Article, pk=pk)
+
+
+class CategoryListView(ListView):
+    paginate_by = 1
+    template_name = 'blog/category_list.html'
+
+    def get_queryset(self):
+        global category
+        slug = self.kwargs.get('slug')
+        category = get_object_or_404(Category.objects.active(), slug=slug)
+        return category.articles.published()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = category
+        return context
+
+# = category OR
+
+
+# def category(request, slug, page=1):
+#     category = get_object_or_404(Category, slug=slug, status=True)
+#     articles_list = category.articles.published()
+#     paginator = Paginator(articles_list, 1)
+#     articles = paginator.get_page(page)
+#     context = {
+#         "category": category,
+#         "articles": articles
+#     }
+#     return render(request, "blog/category.html", context)
+
+
+
+class AuthoListView(ListView):
+    paginate_by = 1
+    template_name = "blog/author_list.html"
+
+    def get_queryset(self):
+        global author
+        username = self.kwargs.get('username')
+        author = get_object_or_404(User, username=username)
+        return author.articles.published()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['author'] = author
+        return context

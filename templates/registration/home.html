@@ -1,0 +1,112 @@
+{% extends 'registration/base.html' %}
+{% block title %} {% block title-meta %} 
+    
+{% endblock %} {% endblock %}
+
+{% block main %} 
+    <div class="row">
+        <div class="col-12">
+        {% if object_list %}
+            <div class="card card-primary">
+                <div class="card-header">
+                <h3 class="card-title">Article List</h3>
+
+                    <div class="card-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                        <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                            <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Thumbnail</th>
+                            <th>Category</th>
+                            <th>Author</th>
+                            <th>Description</th>
+                            <th>Publish Date</th>
+                            <th>Specail</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for article in object_list %}
+                            <tr>
+                                <td>
+                                    {% if article.status in "bd"|make_list or user.is_superuser %}
+                                        <a href=" {% url 'account:article-update' article.pk %} ">{{ article.title }}</a>
+                                    {% else %}
+                                        {{ article.title }}
+                                    {% endif %}
+                                </td>
+                                <td><img src="{{ article.thumbnail.url }}" width="100px" height="60px" alt=""></td>
+                                <td>{{ article.category_to_str }}</td>
+                                <td>{{ article.author.get_full_name }}</td>
+                                <td>{{ article.description|truncatewords:"10" }}</td>
+                                <td>{{ article.publish }}</td>
+                                <td>
+                                    {% if article.is_special %}
+                                        <i class="fa fa-check-circle" style="color: green;"></i>
+                                    {% else %}
+                                        <i class="fa fa-minus-circle" style="color: red;"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if article.status == "pb" %}
+                                        <span class="badge badge-success"> Published </span>
+                                        <a class="badge badge-primary" href="{% url 'blog:detail' article.slug %}"> Show view in site </a>
+                                    {% elif article.status == "pd" %}
+                                        <span class="badge badge-secondary"> Pending </span>
+                                        {% if user.is_superuser %}
+                                            <a class="badge badge-info" href="{% url 'blog:preview' article.pk %}"> Show preview in site </a>
+                                        {% endif %}
+                                    {% else %}   
+                                        {% if article.status == "d" %}
+                                        <span class="badge badge-warning"> Draft </span>
+                                        {% else %}
+                                            <span class="badge badge-warning"> Back </span>
+                                        {% endif %}
+                                        <a class="badge badge-info" href="{% url 'blog:preview' article.pk %}"> Show preview in site </a>
+                                    {% endif %}
+                                    {% if user.is_superuser %}
+                                        <a class="badge badge-danger" href="{% url 'account:article-delete' article.pk %}"> Delete </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+        <!-- /.card -->
+        {% else %}
+            <div class="col-md-8 text-center mx-auto">
+                <div class="card card-danger">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">No Articles</h3> 
+                    </div>
+                
+            
+                    <div class="card-body py-4"> 
+                        {% if request.user.is_author or request.user.is_superuser or request.user.is_special_user %}
+                            <p class="py-2 badge badge-info"> You have no <a href="{% url 'account:article-create' %}" style="color: white;"> article </a> published </p>
+                        {% else %}
+                            <p class="py-2 badge badge-info"> You have no article published </p>
+                        {% endif %}
+                    </div>  
+                </div>
+            </div> 
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}

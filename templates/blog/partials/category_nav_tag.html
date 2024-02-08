@@ -1,0 +1,19 @@
+<div class="nav-links">
+    <ul class="links">
+        <li><a href="{% url 'blog:home' %}">HOME</a></li>
+        
+            {% for category in categories %} 
+                <li>
+                    {% if category.parent == None %}
+                        <a href="{% url 'blog:category' category.slug %}">{{category.title}}</a>
+                        <i class='bx bxs-chevron-down htmlcss-arrow arrow'></i>
+                        <ul class="htmlCss-sub-menu sub-menu">
+                            {% if category.children.active %}
+                                {% include 'blog/partials/category_loop.html' %}
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+    </ul>
+</div>

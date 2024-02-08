@@ -1,0 +1,105 @@
+{% extends 'registration/base.html' %}
+{% load widget_tweaks %}
+{% block title %} {% block title-meta %} 
+    Article List
+{% endblock %} {% endblock %}
+
+{% block main %} 
+
+    <div class="col-md-12">
+        <div class="card card-primary">
+            <div class="card-header">
+                {% if request.resolver_match.url_name == 'article-create' %}
+                    <h3 class="card-title mb-0">Add Article</h3> 
+                {% elif request.resolver_match.url_name == 'article-update' %}
+                    <h3 class="card-title mb-0">Update Article</h3> 
+                {% endif %}
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            
+                <div class="card-body"> 
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputTitle">{{ form.title.field.label }}</label>
+                                    {{ form.title|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputLinkAddress">{{ form.slug.field.label }}</label>
+                                    {{ form.slug|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="exampleInputDescription">{{ form.description.field.label }}</label>
+                                    {{ form.description|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="exampleInputCategory">{{ form.category.field.label }}</label>
+                                    {{ form.category|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputThumbnail">{{ form.thumbnail.field.label }}</label>
+                                    {{ form.thumbnail|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputPublish">{{ form.publish.field.label }}</label>
+                                    {{ form.publish|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            {% if user.is_superuser %}
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputAuthor">{{ form.author.field.label }}</label>
+                                    {{ form.author|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputStatus">{{ form.status.field.label }}</label>
+                                    {{ form.status|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputStatus">{{ form.status.field.label }}</label>
+                                    <select name="status" id="id_status" class="select form-control">
+                                        <option value="">----------</option>
+                                        <option value="d">Draft</option>
+                                        <option value="pd">Pending</option>
+                                    </select>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="exampleInputSpecial">{{ form.is_special.field.label }}</label>
+                                    {{ form.is_special }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            {% if user.is_superuser and request.resolver_match.kwargs.pk %}
+                            <a href="{% url 'account:article-delete' request.resolver_match.kwargs.pk %}" class="btn btn-danger">Delete</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>  
+                <!--  /.card-body -->
+         </div>
+    </div> 
+{% endblock %}
+

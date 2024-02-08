@@ -1,0 +1,16 @@
+
+{% for category in category.children.active %}
+    <li class="more">
+        <span>
+            <a href="{% url 'blog:category' category.slug %}">{{category.title}}</a>
+        </span>
+        <ul class="more-sub-menu sub-menu">
+            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'blog:category' category.slug %}">{{category.title}}</a>
+            {% if category.children.active %}
+                {% include 'blog/partials/category_loop.html' %}
+            {% endif %}
+        </ul>
+    </li>
+{% endfor %}
+
+
